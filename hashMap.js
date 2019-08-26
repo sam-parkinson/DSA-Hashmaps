@@ -6,13 +6,12 @@ class HashMap {
     this._deleted = 0;
   }
 
-  static _hashString(string) {
-    let hash = 5381;
-    for (let i = 0; i < string.length; i++) {
-      hash = (hash << 5) + hash + string.charCodeAt(i);
-      hash = hash & hash;
+  get(key) {
+    const index = this._findSlot(key);
+    if (this._hashTable[index] === undefined) {
+      throw new Error('Key error');
     }
-    return hash >>> 0;
+    return this._hashTable[index].value;
   }
 
   set(key, value) {
@@ -32,6 +31,17 @@ class HashMap {
     };
   }
 
+  delete(key) {
+    const index = this._findSlot(key);
+    const slot = this._hashTable[index];
+    if (slot === undefined) {
+      throw new Error('Key error');
+    }
+    slot.DELETED = true;
+    this.length--;
+    this._deleted++;
+  }
+
   _findSlot(key) {
     const hash = HashMap._hashString(key);
     const start = hash % this._capacity;
@@ -45,5 +55,28 @@ class HashMap {
     }
   }
 
-  
+  _resize(size) {
+    const oldSlots = this._hashTable;
+    this._capacity = size;
+    this.length = 0;
+    this._deleted = 0;
+    this._hashTable = [];
+
+    for (const slot of oldSlots) {
+      if (slot !== undefined && !slot.DELETED) {
+        this.set(slot.key, slot.value);
+      }
+    }
+  }
+
+  static _hashString(string) {
+    let hash = 5381;
+    for (let i = 0; i < string.length; i++) {
+      hash = (hash << 5) + hash + string.charCodeAt(i);
+      hash = hash & hash;
+    }
+    return hash >>> 0;
+  }
 }
+
+module.exports = HashMap;
