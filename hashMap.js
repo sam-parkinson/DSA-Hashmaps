@@ -79,4 +79,8 @@ class HashMap {
   }
 }
 
-module.exports = HashMap;
+class HashMapChain {}
+
+module.exports = {
+  HashMap,
+};
